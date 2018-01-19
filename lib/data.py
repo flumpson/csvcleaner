@@ -8,26 +8,25 @@ import xlrd
 
 class Data:
 
-    def __init__(self, filename=None, index=None):
+    def __init__(self):
 
         # fields
         self.headers = []
         self.data = []
         self.header2data = {}
 
-
-        # read in a file if provided
-        if (filename != None):
-            if ".csv" in filename:
-                self.readCsvData(filename)
-            if ".xlsx" in filename and index != None:
-                self.readXlsxData(filename, index)
-
     #reads in xlsx based data
     def readXlsxData(self, filename, index):
         workbook = xlrd.open_workbook(filename, on_demand=True)
-        sheet = workbook.sheet_by_index(index)
-        self.headers = sheet.row_values(0)
+        self.headers = None
+        try:
+            sheet = workbook.sheet_by_index(index)
+            self.headers = sheet.row_values(0)
+        except:
+            if self.headers == None:
+                print "Index out of bounds"
+                return False
+        print self.headers
         #decode all strings to unicode for uniformity
         self.decodeListToUnicode(self.headers)
         for rowx in range(1, sheet.nrows):
@@ -40,6 +39,8 @@ class Data:
             self.decodeListToUnicode(row)
         workbook.release_resources()
         del workbook
+        print "Sheet ",x,"succesfully ingested"
+        return True
 
     # reads the csv data from a file
     def readCsvData(self, filename):

@@ -6,17 +6,21 @@ import csv
 
 class Clean:
 
+
     def __init__(self, filenameIn, index=None):
         self.regex = re.compile(r'[^a-zA-Z0-9\.\s]+')
-        if index != None:
-            self.dataObj = d.Data(filenameIn,index) 
-        else:
-            self.dataObj = d.Data(filenameIn)
-        # self.preMapObj = d.Data(filenameIn)
+        self.dataObj = d.Data()
+        if filenameIn == None:
+            print "No File provided"
+            raise Exception()
         if '.csv' in filenameIn:
+            self.dataObj.readCsvData(filenameIn)
             arr = filenameIn.split(".")
             self.filenameOut = arr[0] + "_clean.csv"
         else:
+            if not self.dataObj.readXlsxData(filenameIn, index):
+                print "Index in workbook out of bounds"
+                raise Exception()
             self.filenameOut = filenameIn.replace(".xlsx","") + "_clean_sheet" + str(index) + ".csv" 
 
     #cleans the interior of each cell
