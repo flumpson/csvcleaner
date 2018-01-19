@@ -7,7 +7,7 @@ import csv
 class Clean:
 
     def __init__(self, filenameIn, index=None):
-        self.regex = re.compile(r'[^a-zA-Z0-9\s]+')
+        self.regex = re.compile(r'[^a-zA-Z0-9\.\s]+')
         if index != None:
             self.dataObj = d.Data(filenameIn,index) 
         else:

@@ -1,4 +1,5 @@
 from lib import clean
+from lib import data
 import xlrd
 
 def csv(filename):
@@ -16,6 +17,12 @@ def xlsx(filename, index):
 		cleanObj = clean.Clean(filename, x)
 		cleanObj.cleanCsvCells()
 		cleanObj.cleanCsvDoc()
+
+def xlsxToCsv(filename, index):
+	for x in index:
+		filenameOut = filename.replace(".xlsx","") + "_clean_sheet" + str(index) + ".csv"
+		dataObj = data.Data(filename,index)
+		dataObj.save()
 
 if __name__ == '__main__':
 	input1 = "sheets.xlsx"
