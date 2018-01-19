@@ -15,12 +15,14 @@ class Data:
         self.data = []
         self.header2data = {}
 
+
         # read in a file if provided
         if (filename != None):
             if ".csv" in filename:
                 self.readCsvData(filename)
             if ".xlsx" in filename and index != None:
                 self.readXlsxData(filename, index)
+
 
     def readXlsxData(self, filename, index):
         workbook = xlrd.open_workbook(filename, on_demand=True)
@@ -106,6 +108,16 @@ class Data:
         # adding entry to headers2raw dictionary
         self.header2data[header] = len(self.headers) - 1
 
+    def remove_column(self, header):
+        if header == None || header == "":
+            print "Invalid input"
+            return
+        idx = self.header2data[header]
+        for x in range(len(self.data)):
+            row = self.data[x]
+            row.remove(row[idx])
+
+
     # Mapping function on the data field
     def mapData(self, function):
         for x in range(self.get_num_columns()):
@@ -118,7 +130,8 @@ class Data:
 
     def save(self, filename=None):
         if filename == None:
-            filename = self.file
+            print "No filename Provided"
+            return
 
         with open(filename, 'wb') as csvfile:
             writer = csv.writer(csvfile)

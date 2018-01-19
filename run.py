@@ -20,12 +20,14 @@ def xlsx(filename, index):
 
 def xlsxToCsv(filename, index):
 	for x in index:
-		filenameOut = filename.replace(".xlsx","") + "_clean_sheet" + str(index) + ".csv"
-		dataObj = data.Data(filename,index)
-		dataObj.save()
+		filenameOut = filename.replace(".xlsx","") + "_clean_sheet" + str(x) + ".csv"
+		dataObj = data.Data(filename,x)
+
+		dataObj.save(filenameOut)
 
 if __name__ == '__main__':
-	input1 = "sheets.xlsx"
+	input1 = "test.xlsx"
+	xlsxToCsv(input1,[0])
 	# csv(input2)
 	# xlsx(input1, [2])
 
