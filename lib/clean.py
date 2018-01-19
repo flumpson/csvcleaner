@@ -27,9 +27,6 @@ class Clean:
     def writeCellString(self,headers):
         self.dataObj.saveCell(headers)
 
-
-
-
     def fileChanged(self):
         preHash = str(hash(tuple(map(tuple, self.preMapObj.data))))
         postHash = str(hash(tuple(map(tuple, self.dataObj.data))))
@@ -39,7 +36,7 @@ class Clean:
     def cleanValue(self, val):
         return re.sub(self.regex, '', val)
 
-    #gets rid of blank lines and dangling return and newline characters in the documents itself.
+    #gets rid of blank lines and dangling return and newline characters in the document itself.
     def cleanCsvDoc(self):
         regexCleaned = open(self.filenameOut).read()
         regexCleaned = re.sub(r'(,,,)[,]*[\r]*[\n]*', "", regexCleaned)

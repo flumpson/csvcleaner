@@ -31,6 +31,8 @@ class Data:
         for rowx in range(1, sheet.nrows):
             cols = sheet.row_values(rowx)
             self.data.append(cols)
+        for i in range(len(self.headers)):
+            self.header2data[self.headers[i]] = i
         workbook.release_resources()
         del workbook
 
@@ -50,10 +52,9 @@ class Data:
         for thing in csvr:
             self.data.append(thing)
         # loop through the headers and k,v pair them w/ the corresponding index
-        c = 0
         for i in range(len(self.headers)):
-            self.header2data[self.headers[i]] = c
-            c += 1
+            self.header2data[self.headers[i]] = i
+
 
     # returns a list of the raw headers
     def get_headers(self):
@@ -109,13 +110,14 @@ class Data:
         self.header2data[header] = len(self.headers) - 1
 
     def remove_column(self, header):
-        if header == None || header == "":
+        if header == None or header == "":
             print "Invalid input"
             return
         idx = self.header2data[header]
         for x in range(len(self.data)):
             row = self.data[x]
-            row.remove(row[idx])
+            row.pop(idx)
+        self.headers.pop(idx)
 
 
     # Mapping function on the data field
