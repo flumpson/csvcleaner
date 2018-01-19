@@ -3,6 +3,7 @@ import sys
 import random as r
 import re
 import xlrd
+#-*- encoding: utf-8 -*-
 
 
 class Data:
@@ -22,16 +23,21 @@ class Data:
             if ".xlsx" in filename and index != None:
                 self.readXlsxData(filename, index)
 
-
+    #reads in xlsx based data
     def readXlsxData(self, filename, index):
         workbook = xlrd.open_workbook(filename, on_demand=True)
         sheet = workbook.sheet_by_index(index)
         self.headers = sheet.row_values(0)
+        #decode all strings to unicode for uniformity
+        self.decodeListToUnicode(self.headers)
         for rowx in range(1, sheet.nrows):
             cols = sheet.row_values(rowx)
             self.data.append(cols)
         for i in range(len(self.headers)):
             self.header2data[self.headers[i]] = i
+        #decode all strings to unicode for uniformity
+        for row in self.data:
+            self.decodeListToUnicode(row)
         workbook.release_resources()
         del workbook
 
@@ -43,36 +49,73 @@ class Data:
         fp.close()
         # create a csv object
         csvr = csv.reader(lines)
-        # set raw_headers to first line
+        # set raw_headers to first line and clean
         self.headers = csvr.next()
-        for i in range(len(self.headers)):
-            self.headers[i] = self.headers[i].strip()
+        for cell in self.headers:
+            cell = cell.strip()
+        #decode all strings to unicode for uniformity
+        self.decodeListToUnicode(self.headers)
         # loop through the rest of csvr and append each list to raw_data
         for thing in csvr:
             self.data.append(thing)
         # loop through the headers and k,v pair them w/ the corresponding index
-        for i in range(len(self.headers)):
+        i = 0
+        for cell in self.headers:
             self.header2data[self.headers[i]] = i
+            i+=1
+        #decode all incoming data to unicode for uniformity
+        for row in self.data:
+            self.decodeListToUnicode(row)
+
+    # utility method for decoding strings to unicode
+    def decodeStringToUnicode(self, cell):
+        if isinstance(cell, str):
+            cell = cell.decode('utf-8', "ignore")
+
+    # utility method for decoding lists of strings to unicode
+    def decodeListToUnicode(self, row):
+        for cell in row:
+            if isinstance(cell, str):
+                cell = cell.decode('utf-8', "ignore")
+
+    # utility method for endcoding strings to byte strings
+    def encodeUnicodeToBytesString(self, cell):
+        if isinstance(cell, str):
+            cell = cell.decode('utf-8', "ignore")
+            
+    # utility method for encoding lists of strings to byte strings
+    def encodeUnicodeListToBytesString(self, row):
+        for cell in row:
+            if isinstance(cell, str):
+                cell = cell.decode('utf-8', "ignore")
+
+    # utility method for encoding all data to byte strings
+    def encodeAllUnicode(self, row):
+        for cell in self.headers:
+            self.encodeUnicodeToBytesString(cell)
+        for row in self.data:
+            self.encodeUnicodeListToBytesString(row)
+
 
 
     # returns a list of the raw headers
-    def get_headers(self):
+    def getHeaders(self):
         return self.headers
 
     # returns the number of raw columns
-    def get_num_columns(self):
+    def getNumColumns(self):
         return len(self.headers)
 
     # returns the number of rows
-    def get_num_rows(self):
+    def getNumRows(self):
         return len(self.data)
 
     # returns a row of raw data with the specified row number
-    def get_row(self, rowNum):
+    def getRow(self, rowNum):
         return self.data[rowNum]
 
     # returns a column of data with the specified header string
-    def get_column(self, header):
+    def getColumn(self, header):
         # list to column values
         col = []
         # header index
@@ -83,16 +126,16 @@ class Data:
         return col
 
     # returns the raw data at the given header, with the given row number
-    def get_value(self, rowNum, header):
+    def getValue(self, rowNum, header):
         return self.data[rowNum][self.header2data.get(header)]
 
     # sets the value at the given header, with the given row number
-    def set_value(self, rowNum, header, value):
+    def setValue(self, rowNum, header, value):
         self.data[rowNum][self.header2data.get(header)] = value
 
     # adds a column to the data set require a header, a type, and the correct
     # number of points
-    def add_column(self, header, plist=None):
+    def addColumn(self, header, plist=None):
         # adding header to list of headers
         self.headers.append(header)
         # initializing counter
@@ -108,8 +151,8 @@ class Data:
         # adding entry to headers2raw dictionary
         self.header2data[header] = len(self.headers) - 1
 
-    def remove_column(self, header):
-        if header == None or header == "":
+    def removeColumn(self, header):
+        if header == None or header == "" or isinstance(header,str):
             print "Invalid input"
             return
         idx = self.header2data[header]
@@ -121,14 +164,15 @@ class Data:
 
     # Mapping function on the data field
     def mapData(self, function):
-        for x in range(self.get_num_columns()):
+        for x in range(self.getNumColumns()):
             self.headers[x] = function(
-                repr(self.headers[x].encode('utf-8')))
-        for x in range(self.get_num_rows()):
-            for y in range(self.get_num_columns()):
+                repr(self.headers[x]).encode('utf-8'))
+        for x in range(self.getNumRows()):
+            for y in range(self.getNumColumns()):
                 self.data[x][y] = function(
-                    repr(self.data[x][y].encode('utf-8')))
+                    repr(self.data[x][y]).encode('utf-8'))
 
+    # saves to file
     def save(self, filename=None):
         if filename == None:
             print "No filename Provided"
@@ -140,6 +184,7 @@ class Data:
             for row in self.data:
                 writer.writerow(row)
 
+    # writes individual cells to file
     def saveCell(self, headers):
         print len(self.data)
         print self.header2data
