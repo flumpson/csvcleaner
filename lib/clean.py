@@ -2,6 +2,7 @@
 import data as d
 import re
 import csv
+import os
 
 
 class Clean:
@@ -18,9 +19,11 @@ class Clean:
             arr = filenameIn.split(".")
             self.filenameOut = arr[0] + "_clean.csv"
         else:
-            if not self.dataObj.readXlsxData(filenameIn, index):
+            try: 
+                self.dataObj.readXlsxData(filenameIn, index)
+            except StopIteration:
                 print "Index in workbook out of bounds"
-                raise Exception()
+                raise StopIteration
             self.filenameOut = filenameIn.replace(".xlsx","") + "_clean_sheet" + str(index) + ".csv" 
 
     #cleans the interior of each cell
@@ -42,9 +45,10 @@ class Clean:
 
     #gets rid of blank lines and dangling return and newline characters in the document itself.
     def cleanCsvDoc(self):
-        regexCleaned = open(self.filenameOut).read()
+        resultsPath = os.path.join("results",self.filenameOut)
+        regexCleaned = open(resultsPath).read()
         regexCleaned = re.sub(r'(,,,)[,]*[\r]*[\n]*', "", regexCleaned)
-        with open(self.filenameOut, 'w') as file:
+        with open(resultsPath, 'w') as file:
             file.write(regexCleaned)
 
 

@@ -15,12 +15,12 @@ def csvCells(filename,headers):
 # takes a list of indices representing sheets in the workbook
 def xlsx(filename, index):
 	for x in index:
-		print x,"cur"
+		print "beginning sheet", x
 		try:
 			cleanObj = clean.Clean(filename, x)
 			cleanObj.cleanCsvCells()
 			cleanObj.cleanCsvDoc()
-		except:
+		except StopIteration:
 			print "Issue with page ", x
 			continue
 
@@ -40,13 +40,14 @@ def removeColumn(data, header):
 
 if __name__ == '__main__':
 
-	idx = [1,2,3,4,5,6]
+	idx = [0,1,2,3,4,5,6,7,8]
 	files = [f for f in os.listdir(".")]
 	for file in files:
 		print file
 		if "xlsx" in str(file):
 			xlsx(file, idx)
 			
+
 
 
 

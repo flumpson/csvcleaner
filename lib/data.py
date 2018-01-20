@@ -3,6 +3,7 @@ import sys
 import random as r
 import re
 import xlrd
+import os
 #-*- encoding: utf-8 -*-
 
 
@@ -25,7 +26,7 @@ class Data:
         except:
             if self.headers == None:
                 print "Index out of bounds"
-                return False
+                raise StopIteration
         print self.headers
         #decode all strings to unicode for uniformity
         self.decodeListToUnicode(self.headers)
@@ -39,7 +40,7 @@ class Data:
             self.decodeListToUnicode(row)
         workbook.release_resources()
         del workbook
-        print "Sheet ",x,"succesfully ingested"
+        print "Sheet ",index,"succesfully ingested"
         return True
 
     # reads the csv data from a file
@@ -177,9 +178,13 @@ class Data:
     def save(self, filename=None):
         if filename == None:
             print "No filename Provided"
-            return
-
-        with open(filename, 'wb') as csvfile:
+            raise Exception()
+        subdirectory = "results"
+        try:
+            os.mkdir(subdirectory)
+        except Exception:
+            pass
+        with open(os.path.join(subdirectory,filename), 'wb') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(self.headers)
             for row in self.data:
