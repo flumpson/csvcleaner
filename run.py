@@ -56,17 +56,5 @@ if __name__ == '__main__':
 		if ".csv" in str(file):
 			print "Beginning clean of ",file
 			csv(file)
-			
-
-
-
-
-	# input2 = "LSS Data for Mosaic 01Jul2017-31Oct2017.xlsx"
-	# xlsx(input2,[1])
-
-	# csv(input1)
-	# xlsxToCsv(input2,[2])
-	# xlsx(input1, [2])
-
 
 	
