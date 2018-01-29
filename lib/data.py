@@ -15,10 +15,11 @@ class Data:
         self.headers = []
         self.data = []
         self.header2data = {}
+        # os.path.join("input",filename)
 
     #reads in xlsx based data
     def readXlsxData(self, filename, index):
-        workbook = xlrd.open_workbook(filename, on_demand=True)
+        workbook = xlrd.open_workbook(os.path.join("input",filename), on_demand=True)
         self.headers = None
         try:
             sheet = workbook.sheet_by_index(index)
@@ -27,12 +28,11 @@ class Data:
             if self.headers == None:
                 print "Index out of bounds"
                 raise StopIteration
-        print self.headers
         #decode all strings to unicode for uniformity
         self.decodeListToUnicode(self.headers)
         for rowx in range(1, sheet.nrows):
-            cols = sheet.row_values(rowx)
-            self.data.append(cols)
+            row = sheet.row_values(rowx)
+            self.data.append(row)
         for i in range(len(self.headers)):
             self.header2data[self.headers[i]] = i
         #decode all strings to unicode for uniformity
@@ -41,12 +41,11 @@ class Data:
         workbook.release_resources()
         del workbook
         print "Sheet ",index,"succesfully ingested"
-        return True
 
     # reads the csv data from a file
     def readCsvData(self, filename):
         # read the file lines
-        fp = file(filename, "rU")
+        fp = file(os.path.join("input",filename), "rU")
         lines = fp.readlines()
         fp.close()
         # create a csv object
@@ -69,34 +68,16 @@ class Data:
         for row in self.data:
             self.decodeListToUnicode(row)
 
-    # utility method for decoding strings to unicode
-    def decodeStringToUnicode(self, cell):
-        if isinstance(cell, str):
-            cell = cell.decode('utf-8', "ignore")
 
     # utility method for decoding lists of strings to unicode
     def decodeListToUnicode(self, row):
-        for cell in row:
-            if isinstance(cell, str):
-                cell = cell.decode('utf-8', "ignore")
-
-    # utility method for endcoding strings to byte strings
-    def encodeUnicodeToBytesString(self, cell):
-        if isinstance(cell, str):
-            cell = cell.decode('utf-8', "ignore")
-            
-    # utility method for encoding lists of strings to byte strings
-    def encodeUnicodeListToBytesString(self, row):
-        for cell in row:
-            if isinstance(cell, str):
-                cell = cell.decode('utf-8', "ignore")
-
-    # utility method for encoding all data to byte strings
-    def encodeAllUnicode(self, row):
-        for cell in self.headers:
-            self.encodeUnicodeToBytesString(cell)
-        for row in self.data:
-            self.encodeUnicodeListToBytesString(row)
+        for x in range(len(row)):
+            if isinstance(row[x], str):
+                row[x] = row[x].decode('utf-8', "ignore")
+            if isinstance(row[x], unicode):
+                pass
+            else:
+                row[x] = str(row[x]).decode('utf-8',"ignore")
 
 
 
@@ -168,11 +149,11 @@ class Data:
     def mapData(self, function):
         for x in range(self.getNumColumns()):
             self.headers[x] = function(
-                repr(self.headers[x]).encode('utf-8'))
+                repr(self.headers[x].encode('utf-8')))
         for x in range(self.getNumRows()):
             for y in range(self.getNumColumns()):
                 self.data[x][y] = function(
-                    repr(self.data[x][y]).encode('utf-8'))
+                    repr(self.data[x][y].encode('utf-8')))
 
     # saves to file
     def save(self, filename=None):

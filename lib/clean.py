@@ -43,11 +43,11 @@ class Clean:
     def cleanValue(self, val):
         return re.sub(self.regex, '', val)
 
-    #gets rid of blank lines and dangling return and newline characters in the document itself.
-    def cleanCsvDoc(self):
+    #gets rid of specified regex in the file at the document level, can be used to remove empty rows or other document level defects, which differ from doc to doc
+    def cleanCsvDoc(self, regex):
         resultsPath = os.path.join("results",self.filenameOut)
         regexCleaned = open(resultsPath).read()
-        regexCleaned = re.sub(r'(,,,)[,]*[\r]*[\n]*', "", regexCleaned)
+        regexCleaned = re.sub(regex, "", regexCleaned)
         with open(resultsPath, 'w') as file:
             file.write(regexCleaned)
 

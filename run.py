@@ -3,23 +3,25 @@ from lib import data
 import xlrd
 import os
 
-def csv(filename):
+def csv(filename, regex=None):
 	cleanObj = clean.Clean(filename)
 	cleanObj.cleanCsvCells()
-	cleanObj.cleanCsvDoc()
+	if regex is not None:
+		cleanObj.cleanCsvDoc(regex)
 
 def csvCells(filename,headers):
 	cleanObj = clean.Clean(filename)
 	cleanObj.writeCellString(headers)
 
 # takes a list of indices representing sheets in the workbook
-def xlsx(filename, index):
+def xlsx(filename, index, regex=None):
 	for x in index:
 		print "beginning sheet", x
 		try:
 			cleanObj = clean.Clean(filename, x)
 			cleanObj.cleanCsvCells()
-			cleanObj.cleanCsvDoc()
+			if regex is not None:
+				cleanObj.cleanCsvDoc(regex)
 		except StopIteration:
 			print "Issue with page ", x
 			continue
@@ -40,23 +42,19 @@ def removeColumn(data, header):
 
 if __name__ == '__main__':
 
-	idx = [0,1,2,3,4,5,6,7,8]
-	files = [f for f in os.listdir(".")]
+	idx = [3]
+	subdirectory = "input"
+        try:
+            os.mkdir(subdirectory)
+        except Exception:
+            pass
+	files = [f for f in os.listdir("./input")]
 	for file in files:
-		print file
-		if "xlsx" in str(file):
+		if ".xlsx" in str(file):
+			print "Beginning clean of ",file
 			xlsx(file, idx)
-			
-
-
-
-
-	# input2 = "LSS Data for Mosaic 01Jul2017-31Oct2017.xlsx"
-	# xlsx(input2,[1])
-
-	# csv(input1)
-	# xlsxToCsv(input2,[2])
-	# xlsx(input1, [2])
-
+		if ".csv" in str(file):
+			print "Beginning clean of ",file
+			csv(file)
 
 	
